@@ -58,8 +58,8 @@
 				6D8D14DD2AC1C7BB0006E39E /* VroombaApp.swift */,
 				6D96158A2B6838ED00CE4456 /* Handler.swift */,
 				6D8D14DF2AC1C7BB0006E39E /* ContentView.swift */,
-				6D8D14E12AC1C7BC0006E39E /* Assets.xcassets */,
 				6D96158E2B68FBAF00CE4456 /* Joystick.swift */,
+				6D8D14E12AC1C7BC0006E39E /* Assets.xcassets */,
 				6D8D14E32AC1C7BC0006E39E /* Preview Content */,
 			);
 			path = Vroomba;
