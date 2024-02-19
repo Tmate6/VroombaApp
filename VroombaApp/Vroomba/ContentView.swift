@@ -51,7 +51,7 @@ struct ContentView: View {
                         Task {
                             await roomba.sendMotorPositions(left: 0, right: 0)
                         }
-                        print(roomba.online)
+                        //print(roomba.online)
                     }
                     return
                 }
@@ -62,7 +62,7 @@ struct ContentView: View {
                     Task {
                         await roomba.joystickHandler(distance: distance, angle: angle)
                     }
-                    print(roomba.online)
+                    //print(roomba.online)
                 }
             }
         }
@@ -87,7 +87,7 @@ struct ContentView: View {
                         await roomba.joystickHandler(distance: distance, angle: angle)
                     }
                 }
-                print(roomba.online)
+                //print(roomba.online)
             }
         }
     }

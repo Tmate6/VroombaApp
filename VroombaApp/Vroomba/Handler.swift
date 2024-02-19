@@ -57,6 +57,7 @@ class RoombaManager: ObservableObject {
             
     private var cancellables: Set<AnyCancellable> = []
 
+    
     func joystickHandler(distance: Int, angle: Int) async {
         // Set both to max value
         var left: Int = distance
@@ -76,12 +77,17 @@ class RoombaManager: ObservableObject {
         }
         
         if left < -100 {
-            left = -100
+            left = -100 + (100 - (distance))
         }
         if right < -100 {
-            right = -100
+            right = -100 + (100 - (distance))
         }
         
+        
+        left = min(max(left, -100), 100)
+        right = min(max(right, -100), 100)
+        
+        print("angle: ", angle, "distance: ", distance)
         print(left, right)
         
         await sendMotorPositions(left: left, right: right)

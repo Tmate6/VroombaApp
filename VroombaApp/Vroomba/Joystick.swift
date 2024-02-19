@@ -53,11 +53,11 @@ struct JoystickView: View {
                     self.dontSnapFor -= 1
                 }
                 
-                if !(pos.x < mid.x + 10 && pos.x > mid.x - 10) { // If not near mid (x)
+                if !(pos.x < mid.x + 25 && pos.x > mid.x - 25) { // If not near mid (x)
                     newPos.x += value.translation.width
                     newPos.y += value.translation.height
 
-                } else if !(pos.y < mid.y + 10 && pos.y > mid.y - 10) { // If not near mid (y)
+                } else if !(pos.y < mid.y + 25 && pos.y > mid.y - 25) { // If not near mid (y)
                     newPos.x += value.translation.width
                     newPos.y += value.translation.height
                     
@@ -119,7 +119,7 @@ struct JoystickView: View {
 
                 Circle()
                     .stroke(Color.gray)
-                    .frame(width: 60)
+                    .frame(width: 80)
                     .position(mid)
 
                 Circle()
