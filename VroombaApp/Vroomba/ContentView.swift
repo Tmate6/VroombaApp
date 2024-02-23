@@ -9,6 +9,10 @@ import SwiftUI
 import Foundation
 
 struct ContentView: View {
+    @State var currentControlView: CurrentControlView = .Joystick
+    
+    @State var tiltSensitivity: Double = 300
+    
     @State var distance: Int = 0
     @State private var lastSentDistance: Int? = nil
     
@@ -16,7 +20,6 @@ struct ContentView: View {
     @State private var lastSentAngle: Int? = nil
     
     @ObservedObject var roomba: RoombaManager = RoombaManager()
-    
     
     var body: some View {
         VStack {
@@ -36,10 +39,42 @@ struct ContentView: View {
             .padding([.top, .leading, .trailing])
             
             GroupBox {
-                JoystickView(distance: $distance, angle: $angle)
+                HStack {
+                    Text("Controller type")
+                    Spacer()
+                    Picker("", selection: $currentControlView) {
+                        ForEach(CurrentControlView.allCases, id: \.self) { option in
+                            Text(String(describing: option))
+                        }
+                    }
+                }
             }
-            .aspectRatio(contentMode: .fit)
-            .padding()
+            .padding([.top, .leading, .trailing])
+            .padding(.bottom, 2)
+            
+            switch currentControlView {
+            case .Joystick:
+                GroupBox {
+                    JoystickView(distance: $distance, angle: $angle)
+                }
+                .aspectRatio(contentMode: .fit)
+                .padding(.horizontal)
+                
+            case .Tilt:
+                GroupBox {
+                    TiltView(sensitivity: $tiltSensitivity, distance: $distance, angle: $angle)
+                }
+                .aspectRatio(contentMode: .fit)
+                .padding(.horizontal)
+                
+                GroupBox {
+                    HStack {
+                        Text("Sensitivity")
+                        Slider(value: $tiltSensitivity, in: 200...800)
+                    }
+                }
+                .padding(.horizontal)
+            }
             
             Spacer()
         }
@@ -51,7 +86,6 @@ struct ContentView: View {
                         Task {
                             await roomba.sendMotorPositions(left: 0, right: 0)
                         }
-                        //print(roomba.online)
                     }
                     return
                 }
@@ -62,7 +96,6 @@ struct ContentView: View {
                     Task {
                         await roomba.joystickHandler(distance: distance, angle: angle)
                     }
-                    //print(roomba.online)
                 }
             }
         }

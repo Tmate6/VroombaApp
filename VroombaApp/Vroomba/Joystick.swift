@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-struct JoystickView: View {
+struct JoystickView: View, ControlView {
     @State private var mid: CGPoint = CGPoint(x: 0, y: 0)
     @State private var radius: CGFloat = 0 // Radius of bounds circle. Change in .onAppear to modity size
     @State private var pos: CGPoint = CGPoint(x: 50, y: 50)
