@@ -41,7 +41,6 @@
 		6D8D14D12AC1C7BB0006E39E = {
 			isa = PBXGroup;
 			children = (
-				6DBAC4212B87C6F5000D39D7 /* Tilt.swift */,
 				6D8D14DC2AC1C7BB0006E39E /* Vroomba */,
 				6D8D14DB2AC1C7BB0006E39E /* Products */,
 			);
@@ -58,6 +57,7 @@
 		6D8D14DC2AC1C7BB0006E39E /* Vroomba */ = {
 			isa = PBXGroup;
 			children = (
+				6DBAC4212B87C6F5000D39D7 /* Tilt.swift */,
 				6D8D14DD2AC1C7BB0006E39E /* VroombaApp.swift */,
 				6D96158A2B6838ED00CE4456 /* Handler.swift */,
 				6D8D14DF2AC1C7BB0006E39E /* ContentView.swift */,

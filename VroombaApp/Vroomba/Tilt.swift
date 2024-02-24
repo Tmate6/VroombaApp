@@ -20,25 +20,23 @@ class MotionManager {
             }
         }
     }
-
-    func stopDeviceMotionUpdates() {
-        motionManager.stopDeviceMotionUpdates()
-    }
 }
 
 
-struct TiltView: View, ControlView {
+struct TiltView: View {
     @State private var mid: CGPoint = CGPoint(x: 0, y: 0)
     @State private var radius: CGFloat = 0 // Radius of bounds circle. Change in .onAppear to modity size
     @State private var pos: CGPoint = CGPoint(x: 50, y: 50)
     
     // Preset values
     @Binding var sensitivity: Double
-    var snapWidth: CGFloat = 120
+    private let snapWidth: CGFloat = 120
     
     private let motionManager = MotionManager()
     @State private var pitch: Double = 0
     @State private var roll: Double = 0
+    
+    @State private var stop: Bool = false
     
     // Output values. Distance from 0-100 and angle in degrees
     @Binding var distance: Int
@@ -57,16 +55,21 @@ struct TiltView: View, ControlView {
                 
                 Circle() // Snap cirlce
                     .stroke(Color.gray)
+                    .contentShape(Circle())
                     .frame(width: snapWidth)
                     .position(mid)
+                    .onTapGesture {
+                        stop.toggle()
+                    }
                 
                 Circle() // Bounds circle
                     .stroke(Color.gray, lineWidth: 4)
                     .frame(width: radius*2)
                     .position(mid)
                 
+                
                 Circle() // Moving circle
-                    .foregroundColor(.white)
+                    .foregroundColor(stop ? .red : .white)
                     .frame(width: 50)
                     .position(pos)
             }
@@ -87,9 +90,13 @@ struct TiltView: View, ControlView {
                 }
             }
             .onDisappear {
-                self.motionManager.stopDeviceMotionUpdates()
+                self.stop = true
             }
             .onChange(of: pitch) {
+                if stop {
+                    return
+                }
+                
                 var newPos: CGPoint
                 
                 let effectiveRoll = self.roll * sensitivity
@@ -125,6 +132,11 @@ struct TiltView: View, ControlView {
                 
                 withAnimation {
                     self.pos = newPos
+                }
+            }
+            .onChange(of: stop) {
+                if stop {
+                    self.pos = mid
                 }
             }
         }

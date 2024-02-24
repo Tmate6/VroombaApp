@@ -8,7 +8,7 @@
 import SwiftUI
 import Foundation
 
-struct JoystickView: View, ControlView {
+struct JoystickView: View {
     @State private var mid: CGPoint = CGPoint(x: 0, y: 0)
     @State private var radius: CGFloat = 0 // Radius of bounds circle. Change in .onAppear to modity size
     @State private var pos: CGPoint = CGPoint(x: 50, y: 50)
@@ -24,6 +24,7 @@ struct JoystickView: View, ControlView {
     private let dontSnapForDefault: Int = 20
     private let staySnappedForDefault: Int = 40
 
+    
     @Binding var distance: Int
     @Binding var angle: Int
 
@@ -116,17 +117,17 @@ struct JoystickView: View, ControlView {
                     path.addLine(to: pos)
                 }
                 .stroke(Color.gray, style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-
+                
                 Circle()
                     .stroke(Color.gray)
                     .frame(width: 80)
                     .position(mid)
-
+                
                 Circle()
                     .stroke(Color.gray, lineWidth: 4)
                     .frame(width: radius*2)
                     .position(mid)
-
+                
                 Circle()
                     .foregroundColor(.white)
                     .frame(width: 50)

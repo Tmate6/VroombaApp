@@ -42,11 +42,27 @@ struct ContentView: View {
                 HStack {
                     Text("Controller type")
                     Spacer()
-                    Picker("", selection: $currentControlView) {
-                        ForEach(CurrentControlView.allCases, id: \.self) { option in
-                            Text(String(describing: option))
+                    
+                    // Cutsom view as Picker() causes freezes
+                    Button(action: {
+                        currentControlView = .Joystick
+                    }, label: {
+                        GroupBox {
+                            Text("Joystick")
+                                .foregroundStyle(currentControlView == .Joystick ? Color.primary : Color.secondary)
+                                .padding(.vertical, -3)
                         }
-                    }
+                    })
+                    
+                    Button(action: {
+                        currentControlView = .Tilt
+                    }, label: {
+                        GroupBox {
+                            Text("Tilt")
+                                .foregroundStyle(currentControlView == .Tilt ? Color.primary : Color.secondary)
+                                .padding(.vertical, -3)
+                        }
+                    })
                 }
             }
             .padding([.top, .leading, .trailing])
@@ -74,6 +90,7 @@ struct ContentView: View {
                     }
                 }
                 .padding(.horizontal)
+                
             }
             
             Spacer()

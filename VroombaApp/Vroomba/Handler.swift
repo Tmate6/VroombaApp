@@ -8,11 +8,6 @@
 import SwiftUI
 import Combine
 
-protocol ControlView {
-    var distance: Int { get }
-    var angle: Int { get }
-}
-
 enum CurrentControlView: CaseIterable {
     case Joystick
     case Tilt
