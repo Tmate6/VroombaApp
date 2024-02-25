@@ -67,11 +67,13 @@ struct TiltView: View {
                     .frame(width: radius*2)
                     .position(mid)
                 
-                
                 Circle() // Moving circle
                     .foregroundColor(stop ? .red : .white)
                     .frame(width: 50)
                     .position(pos)
+                    .onTapGesture {
+                        stop.toggle()
+                    }
             }
             .onAppear {
                 mid = CGPoint(x: geometry.size.width/2, y: geometry.size.height/2)

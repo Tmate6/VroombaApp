@@ -135,11 +135,16 @@ struct JoystickView: View {
                     .gesture(
                         simpleDrag.simultaneously(with: fingerDrag)
                     )
+                    .onTapGesture {
+                        self.pos = mid
+                        self.distance = 0
+                        self.angle = 0
+                    }
             }
             .onAppear {
-                mid = CGPoint(x: geometry.size.width/2, y: geometry.size.height/2)
-                pos = mid
-                radius = geometry.size.width/2
+                self.mid = CGPoint(x: geometry.size.width/2, y: geometry.size.height/2)
+                self.pos = mid
+                self.radius = geometry.size.width/2
             }
         }
     }
