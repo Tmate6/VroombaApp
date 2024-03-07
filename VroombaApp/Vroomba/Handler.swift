@@ -5,8 +5,16 @@
 //  Created by Mate Tohai on 29/01/2024.
 //
 
+import Foundation
 import SwiftUI
 import Combine
+
+extension Double {
+    func rounded(toPlaces places:Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return (self * divisor).rounded() / divisor
+    }
+}
 
 enum CurrentControlView: CaseIterable {
     case Joystick
@@ -15,14 +23,117 @@ enum CurrentControlView: CaseIterable {
 
 class RoombaManager: ObservableObject {
     @Published var online: Bool = false
+    @Published var voltage: Double? = nil
     
-    func sendRequest(left: Int, right: Int) async throws -> Bool {
+    let statusPollingInterval: Int = 5_000_000_000
+    
+    func startStatusPolling() {
+        print("starting")
+        Task {
+            while true {
+                do {
+                    print("sending req")
+                    let _ = try await sendStatusRequest()
+                }
+                catch {
+                    withAnimation {
+                        self.online = false
+                    }
+                }
+                try? await Task.sleep(nanoseconds: UInt64(statusPollingInterval))
+            }
+        }
+    }
+    
+    func sendStatusRequest() async throws -> Bool {
+        guard let url = URL(string: "http://192.168.4.1/status") else {
+            withAnimation {
+                self.online = false
+            }
+            return false
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let voltage = json["voltage"] as? Double {
+            
+            if self.voltage == nil {
+                self.voltage = 0
+                while self.voltage! < voltage {
+                    let newVoltage: Double = self.voltage! + 0.01
+                    
+                    withAnimation {
+                        self.voltage = newVoltage.rounded(toPlaces: 2)
+                    }
+                    if self.voltage == voltage {
+                        break
+                    }
+                    try? await Task.sleep(nanoseconds: 50)
+                }
+            }
+            
+            while self.voltage! < voltage {
+                let newVoltage: Double = self.voltage! + 0.01
+                
+                withAnimation {
+                    self.voltage = newVoltage.rounded(toPlaces: 2)
+                }
+                if self.voltage == voltage {
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+            while self.voltage! > voltage {
+                let newVoltage: Double = self.voltage! - 0.01
+                
+                withAnimation {
+                    self.voltage! = newVoltage.rounded(toPlaces: 2)
+                }
+                if self.voltage == voltage {
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+            withAnimation {
+                self.online = true
+            }
+            return true
+            
+        } else {
+            withAnimation {
+                self.online = false
+                self.voltage = nil
+            }
+            throw URLError(.cannotParseResponse)
+        }
+    }
+    
+    func sendMovementRequest(left: Int?, right: Int?) async throws -> Bool {
         guard let url = URL(string: "http://192.168.4.1/") else {
-            self.online = false
+            withAnimation {
+                self.online = false
+            }
             return false
         }
         
-        let body = ["left": left, "right": right]
+        var body: [String: Int]
+        
+        if left == nil {
+            body = ["right": right!]
+        } else if right == nil {
+            body = ["left": left!]
+        } else {
+            body = ["left": left!, "right": right!]
+        }
+        
         let finalBody = try! JSONEncoder().encode(body)
         
         var request = URLRequest(url: url)
@@ -39,7 +150,7 @@ class RoombaManager: ObservableObject {
         // Once again, blatantly stolen code from https://stackoverflow.com/questions/75019438/swift-have-a-timeout-for-async-await-function
         
         let requestTask = Task {
-            let taskResult = try await sendRequest(left: left, right: right)
+            let taskResult = try await sendMovementRequest(left: left, right: right)
             try Task.checkCancellation()
             
             return taskResult
@@ -54,9 +165,13 @@ class RoombaManager: ObservableObject {
             let result = try await requestTask.value
             timeoutTask.cancel()
             
-            self.online = result
+            withAnimation {
+                self.online = result
+            }
         } catch {
-            self.online = false
+            withAnimation {
+                self.online = false
+            }
         }
     }
             

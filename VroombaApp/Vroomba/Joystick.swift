@@ -24,7 +24,6 @@ struct JoystickView: View {
     private let dontSnapForDefault: Int = 20
     private let staySnappedForDefault: Int = 40
 
-    
     @Binding var distance: Int
     @Binding var angle: Int
 

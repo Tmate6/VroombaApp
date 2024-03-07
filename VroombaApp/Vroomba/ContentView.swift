@@ -8,6 +8,7 @@
 import SwiftUI
 import Foundation
 
+
 struct ContentView: View {
     @State var currentControlView: CurrentControlView = .Joystick
     
@@ -23,24 +24,42 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            GroupBox {
-                HStack {
-                    Circle()
-                        .frame(width: 10)
-                        .padding(.leading, 8)
-                        .foregroundStyle(roomba.online ? Color.green : Color.red)
-                    
-                    Text("Vroomba")
-                        .font(.largeTitle)
-                        .padding([.leading, .trailing])
-                    Spacer()
+            Button(action: {
+                Task {
+                    try await roomba.sendStatusRequest()
                 }
-            }
-            .padding([.top, .leading, .trailing])
+            }, label: {
+                GroupBox {
+                    HStack {
+                        Circle()
+                            .frame(width: 10)
+                            .padding(.leading, 8)
+                            .foregroundStyle(roomba.online ? Color.green : Color.red)
+                        
+                        Text("Vroomba")
+                            .font(.largeTitle)
+                            .padding([.leading, .trailing])
+                            .foregroundStyle(Color.primary)
+                        Spacer()
+                        
+                        Text(roomba.voltage == nil ? "-" : String(format: "%.2fV", roomba.voltage!))
+                            .foregroundStyle(roomba.voltage ?? 0.00 > 19 ?
+                                             Color.green :
+                                                roomba.voltage ?? 0.00 > 18 ?
+                                             Color.yellow :
+                                                roomba.voltage ?? 0.00 > 17 ?
+                                             Color.orange :
+                                                Color.red)
+                            .font(.title)
+                            .padding([.leading, .trailing])
+                    }
+                }
+                .padding([.top, .leading, .trailing])
+            })
             
             GroupBox {
                 HStack {
-                    Text("Controller type")
+                    Text("Controller")
                     Spacer()
                     
                     // Cutsom view as Picker() causes freezes
@@ -90,9 +109,7 @@ struct ContentView: View {
                     }
                 }
                 .padding(.horizontal)
-                
             }
-            
             Spacer()
         }
         .onChange(of: distance) {
@@ -116,7 +133,6 @@ struct ContentView: View {
                 }
             }
         }
-        
         .onChange(of: angle) {
             withAnimation {
                 if distance == 0 {
@@ -139,6 +155,9 @@ struct ContentView: View {
                 }
                 //print(roomba.online)
             }
+        }
+        .onAppear {
+            roomba.startStatusPolling()
         }
     }
 }
